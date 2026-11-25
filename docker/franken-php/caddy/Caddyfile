@@ -1,0 +1,29 @@
+{
+    # Enable FrankenPHP
+    frankenphp {
+        php_ini max_execution_time 300
+        php_ini memory_limit 384M
+    }
+
+    order php_server before file_server
+}
+
+# serve mailpit UI behind proxy
+mail.localhost {
+    reverse_proxy mailpit:8025
+    tls internal
+}
+
+# serve the symfony app
+app.localhost {
+    # set the root to the public directory so that source files are inaccessible
+    root * /var/www/public
+
+    # enable compression and internal tls
+    encode zstd br gzip
+    tls internal
+
+    php_server
+
+    file_server
+}
